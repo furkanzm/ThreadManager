@@ -4,7 +4,7 @@
 #include <iostream>
 #include <mutex>
 #include <thread>
-
+#include <sstream>
 using namespace std::chrono_literals;
 
 class ThreadManager
@@ -19,19 +19,16 @@ public:
 	void setInterval(int x);				   // ne kadar çalışacak
 	void wait();   // kendi kendine bitmesini bekleyeceğiz
 	void notify(); // tekrar başlama
-    void spin();
 private:
-    int i ;
-    int buffer = 0;
-	int miliSecond = 100;
+	int milliSecond = 1;
 	std::function<int()> cb;
 	void worker();
 	std::thread *thread_object;
 	std::mutex mtx;
 	std::condition_variable stoper;
-    std::unique_lock<std::mutex> lock{ mtx };    
-	bool stopped = false;
-	bool sFlag;
+	bool stopFlag = false;
+    bool startFlag = false;
   //  int i = 0;
 
 };
+
