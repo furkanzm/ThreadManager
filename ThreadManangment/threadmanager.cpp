@@ -36,7 +36,8 @@ void ThreadManager::wait()
 
 void ThreadManager::notify()
 {
-	stoper.notify_one();
+   std::cout << "thread notify!!" << std::endl;    
+	stoper.notify_all();
 } //
 
 void ThreadManager::stop()
@@ -51,8 +52,8 @@ void ThreadManager::worker()
 {
 	std::unique_lock<std::mutex> lck(mtx);
 
-	while (1) {
-		stoper.wait_for(lck, std::chrono::milliseconds(milliSecond * 100));
+	while (startFlag) {
+		stoper.wait_for(lck, std::chrono::milliseconds(milliSecond));
 		if (stopFlag)
 			break;
 		int temp = cb();
