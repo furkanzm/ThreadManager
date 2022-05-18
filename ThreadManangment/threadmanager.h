@@ -20,7 +20,7 @@ public:
 	void wait();   // kendi kendine bitmesini bekleyeceğiz
 	void notify(); // tekrar başlama
 private:
-	int milliSecond = 1;
+	int milliSecond = 1000;
 	std::function<int()> cb;
 	void worker();
 	std::thread *thread_object;
@@ -31,4 +31,3 @@ private:
   //  int i = 0;
 
 };
-
