@@ -17,15 +17,11 @@ int main()
 {
 	ThreadManager work;
 	work.setFunc(run);
-	work.setInterval(1); // saniye
+	work.setInterval(1000); // second
 	work.start();
-	// work.wait();
-
-	// work.notify();
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(500)); // milisaniye
-	// work.stop();
-	work.stop();
-	std::this_thread::sleep_for(std::chrono::milliseconds(4000)); // milisaniye
+	std::this_thread::sleep_for(std::chrono::milliseconds(5000)); // millisecond
+	//work.stop();
+	work.notify();
+	std::this_thread::sleep_for(std::chrono::milliseconds(4000)); // millisecond
 	return 0;
 }
