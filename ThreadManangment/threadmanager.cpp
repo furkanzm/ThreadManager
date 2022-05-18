@@ -6,71 +6,58 @@ ThreadManager::ThreadManager()
 
 ThreadManager::~ThreadManager()
 {
-	delete thread_object;
 }
 
 void ThreadManager::start()
 {
-	// std::lock_guard<std::mutex> guard(mtx);
-	// startTime = std::chrono::steady_clock::now();
-	sFlag = true;
+	startFlag = true;
+	stopFlag = false;
+	std::cout << "thread started" << std::endl;
 	thread_object = new std::thread(&ThreadManager::worker, this);
 
-} // başlayacak
+} // start
 
 void ThreadManager::setFunc(std::function<int(void)> cb)
 {
 	this->cb = cb;
-} // iş görecek funksiyon
+} // set function
 
 void ThreadManager::setInterval(int x)
 {
-	miliSecond *= x;
+	milliSecond = x;
 
-} // ne kadar çalışacak
+} // how long is work
 
 void ThreadManager::wait()
 {
-	/*std::unique_lock<std::mutex> L {mtx};
-	stoper.wait(L, [&]() { return stopped; });
-	if (stopped) {
-		std::cout << "wait!" << std::endl;
-	}*/
+	std::cout << "thread waiting!" << std::endl;
 	thread_object->join();
-} // kendi kendine bitmesini bekleyeceğiz
+} // self exit wait
 
 void ThreadManager::notify()
 {
-	std::unique_lock<std::mutex> lck(mtx);
-	while (stoper.wait_for(lck, std::chrono::seconds(miliSecond)) ==
-		   std::cv_status::timeout) {
-		std::cout << '.' << std::endl;
-	}
-} // tekrar başlama
+	stoper.notify_one();
+} //
 
 void ThreadManager::stop()
 {
-	sFlag = false;
-	stoper.notify_one();
-	std::cout << "thread exit" << std::endl;
+	stopFlag = true;
+	std::cout << "thread stopped!" << std::endl;
+	stoper.notify_all();
 
-} // duracak, kullanıcı istediğinide de durdurabilecek.
-void ThreadManager::spin()
-{
-	const int work = 1000 * 1000 * 40;
-	volatile int v = 0;
-	for (int j = 0; j < work; ++j)
-		++v;
-}
+} // this is
 
 void ThreadManager::worker()
 {
-	while (sFlag) {
+	std::unique_lock<std::mutex> lck(mtx);
 
+	while (1) {
+		stoper.wait_for(lck, std::chrono::milliseconds(milliSecond * 100));
+		if (stopFlag)
+			break;
 		int temp = cb();
 		if (temp)
 			break;
-		spin();
-		// lck.unlock();
 	}
+	std::cout << "thread exit" << std::endl;
 }
